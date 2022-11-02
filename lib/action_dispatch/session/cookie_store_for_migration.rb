@@ -1,8 +1,8 @@
 module ActionDispatch
   module Session
     class CookieStoreForMigration < ActionDispatch::Session::CookieStore
-      ENV_SESSION_KEY = 'Rack::RACK_SESSION'
-      ENV_SESSION_OPTIONS_KEY = 'Rack::RACK_SESSION_OPTIONS'
+      ENV_SESSION_KEY = Rack::RACK_SESSION
+      ENV_SESSION_OPTIONS_KEY = Rack::RACK_SESSION_OPTIONS
 
       def initialize(app, options = {})
         super app, options
