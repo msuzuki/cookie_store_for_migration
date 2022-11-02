@@ -19,7 +19,7 @@ module ActionDispatch
       def context(env)
         status, headers, body = super(env)
 
-        options = env[ENV_SESSION_OPTIONS_KEY]
+        options = env.env[ENV_SESSION_OPTIONS_KEY] rescue env[ENV_SESSION_OPTIONS_KEY]
 
         if @destroy_source_session && options[:alternative_store]
           Rack::Utils.set_cookie_header!(
@@ -51,7 +51,7 @@ module ActionDispatch
       end
 
       def load_session(env)
-        options = env[ENV_SESSION_OPTIONS_KEY]
+        options = env.env[ENV_SESSION_OPTIONS_KEY] rescue env[ENV_SESSION_OPTIONS_KEY]
         if options[:alternative_store]
           env_dup = duplicate_env_without_session(env)
           store = @source_store.new(nil, @source_options)
@@ -66,8 +66,9 @@ module ActionDispatch
 
       def prepare_session(env)
         super env
-        options = env[ENV_SESSION_OPTIONS_KEY]
-        cookies = Rack::Request.new(env).cookies
+        options = env.env[ENV_SESSION_OPTIONS_KEY] rescue env[ENV_SESSION_OPTIONS_KEY]
+        #cookies = Rack::Request.new(env).cookies
+        cookies = env.cookie_jar
 
         options[:alternative_store] = !cookies.key?(key) && cookies.key?(@source_options[:key])
         options[:destroy_source_session] = @destroy_source_session &&
@@ -76,7 +77,7 @@ module ActionDispatch
 
       def extract_session_id(env)
         sid = super env
-        options = env[ENV_SESSION_OPTIONS_KEY]
+        options = env.env[ENV_SESSION_OPTIONS_KEY] rescue env[ENV_SESSION_OPTIONS_KEY]
         if options[:alternative_store]
           env_dup = duplicate_env_without_session(env)
           store = @source_store.new(nil, @source_options)
